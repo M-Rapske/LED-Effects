@@ -279,3 +279,57 @@
           spark_probability: 10%
           use_random_color: false
           fade_out_rate: 120
+      - addressable_lambda:
+          name: "Polizei Deutschland"
+          update_interval: 16ms
+          lambda: |-
+            const int n = it.size();
+            if (n == 0) return;
+      
+            // Helligkeit und Farben
+            const uint8_t brightness = 255;
+            const Color blue = Color(0, 0, brightness);
+            const Color off = Color(0, 0, 0);
+      
+            // Ablauf eines Zyklus (ms):
+            // links an -> aus -> links an -> Pause -> rechts an -> aus -> rechts an -> Pause
+            // ergibt den typischen Doppelblitz pro Seite.
+            const uint32_t phase = millis() % 1400;
+      
+            // Alle LEDs zuerst ausschalten
+            it.all() = off;
+      
+            bool left_on = false;
+            bool right_on = false;
+      
+            if (phase < 110) {
+              left_on = true;
+            } else if (phase < 190) {
+              // dunkel
+            } else if (phase < 300) {
+              left_on = true;
+            } else if (phase < 620) {
+              // Seitenpause
+            } else if (phase < 730) {
+              right_on = true;
+            } else if (phase < 810) {
+              // dunkel
+            } else if (phase < 920) {
+              right_on = true;
+            } else {
+              // Zykluspause
+            }
+      
+            const int half = n / 2;
+      
+            if (left_on) {
+              for (int i = 0; i < half; i++) {
+                it[i] = blue;
+              }
+            }
+      
+            if (right_on) {
+              for (int i = half; i < n; i++) {
+                it[i] = blue;
+              }
+            }
