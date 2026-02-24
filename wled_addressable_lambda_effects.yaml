@@ -1,0 +1,1873 @@
+# Vollständige große WLED-inspirierte Effektliste als einzelne ESPHome addressable_lambda-Effekte.
+# Jeder Effekt ist ein eigener addressable_lambda-Block; Farbvarianten nutzen zufällige/feste Farben.
+
+- addressable_lambda:
+    name: "WLED Solid"
+    update_interval: 20ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((50 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Blink"
+    update_interval: 30ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(53, 97, 193) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Breathe"
+    update_interval: 40ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(62, 134, 218);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Wipe"
+    update_interval: 50ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(39, 87, 129);
+      }
+
+- addressable_lambda:
+    name: "WLED Wipe Random"
+    update_interval: 60ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Random Colors"
+    update_interval: 20ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 12 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Sweep"
+    update_interval: 30ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(66, 102, 138);
+      if (b >= 0 && b < n) it[b] = Color(186, 222, 246);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Dynamic"
+    update_interval: 40ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 40)) % 5) < 4;
+        it[i] = on ? Color(157, 69, 195) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Colorloop"
+    update_interval: 50ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((186 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Rainbow"
+    update_interval: 60ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(221, 105, 201) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Rainbow Cycle"
+    update_interval: 20ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(54, 158, 66);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Scan"
+    update_interval: 30ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(143, 63, 217);
+      }
+
+- addressable_lambda:
+    name: "WLED Dual Scan"
+    update_interval: 40ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Fade"
+    update_interval: 50ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 9 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Fade Colors"
+    update_interval: 60ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(154, 238, 66);
+      if (b >= 0 && b < n) it[b] = Color(178, 6, 62);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Theater"
+    update_interval: 20ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 20)) % 7) < 3;
+        it[i] = on ? Color(117, 221, 235) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Theater Rainbow"
+    update_interval: 30ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((142 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Running"
+    update_interval: 40ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(133, 113, 209) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Saw"
+    update_interval: 50ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(46, 182, 170);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Twinkle"
+    update_interval: 60ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(247, 39, 49);
+      }
+
+- addressable_lambda:
+    name: "WLED Dissolve"
+    update_interval: 20ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Dissolve Rnd"
+    update_interval: 30ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 17 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Sparkle"
+    update_interval: 40ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(242, 118, 250);
+      if (b >= 0 && b < n) it[b] = Color(170, 46, 134);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Dark Sparkle"
+    update_interval: 50ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 50)) % 9) < 2;
+        it[i] = on ? Color(77, 117, 19) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Sparkle+"
+    update_interval: 60ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((98 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Strobe"
+    update_interval: 20ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(45, 121, 217) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Strobe Rainbow"
+    update_interval: 30ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(38, 206, 18);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Strobe Mega"
+    update_interval: 40ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(95, 15, 137);
+      }
+
+- addressable_lambda:
+    name: "WLED Blink Rainbow"
+    update_interval: 50ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Android"
+    update_interval: 60ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 14 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Chase"
+    update_interval: 20ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(74, 254, 178);
+      if (b >= 0 && b < n) it[b] = Color(162, 86, 206);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Chase Random"
+    update_interval: 30ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 30)) % 5) < 4;
+        it[i] = on ? Color(37, 13, 59) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Chase Rainbow"
+    update_interval: 40ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((54 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Chase Flash"
+    update_interval: 50ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(213, 129, 225) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Chase Flash Rnd"
+    update_interval: 60ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(30, 230, 122);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Chase Rainbow White"
+    update_interval: 20ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(199, 247, 225);
+      }
+
+- addressable_lambda:
+    name: "WLED Colorful"
+    update_interval: 30ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Traffic Light"
+    update_interval: 40ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 11 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Sweep Random"
+    update_interval: 50ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(162, 134, 106);
+      if (b >= 0 && b < n) it[b] = Color(154, 126, 22);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Running 2"
+    update_interval: 60ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 60)) % 7) < 3;
+        it[i] = on ? Color(253, 165, 99) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Red & Blue"
+    update_interval: 20ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((190 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Stream"
+    update_interval: 30ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(125, 137, 233) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Scanner"
+    update_interval: 40ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(22, 254, 226);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Lighthouse"
+    update_interval: 50ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(47, 223, 57);
+      }
+
+- addressable_lambda:
+    name: "WLED Fireworks"
+    update_interval: 60ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Rain"
+    update_interval: 20ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 8 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Merry Christmas"
+    update_interval: 30ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(250, 14, 34);
+      if (b >= 0 && b < n) it[b] = Color(146, 166, 94);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Fire Flicker"
+    update_interval: 40ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 40)) % 9) < 2;
+        it[i] = on ? Color(213, 61, 139) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Gradient"
+    update_interval: 50ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((146 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Loading"
+    update_interval: 60ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(37, 145, 241) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Rolling Balls"
+    update_interval: 20ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(14, 22, 74);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Fairy"
+    update_interval: 30ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(151, 199, 145);
+      }
+
+- addressable_lambda:
+    name: "WLED Two Dots"
+    update_interval: 40ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Fairytwinkle"
+    update_interval: 50ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 16 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Running Dual"
+    update_interval: 60ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(82, 150, 218);
+      if (b >= 0 && b < n) it[b] = Color(138, 206, 166);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED RSVD"
+    update_interval: 20ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 20)) % 5) < 4;
+        it[i] = on ? Color(173, 213, 179) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Chase 2"
+    update_interval: 30ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((102 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Tri Chase"
+    update_interval: 40ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(205, 153, 249) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Tri Wipe"
+    update_interval: 50ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(6, 46, 178);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Tri Fade"
+    update_interval: 60ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(255, 175, 233);
+      }
+
+- addressable_lambda:
+    name: "WLED Lightning"
+    update_interval: 20ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED ICU"
+    update_interval: 30ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 13 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Multi Comet"
+    update_interval: 40ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(170, 30, 146);
+      if (b >= 0 && b < n) it[b] = Color(130, 246, 238);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Scanner Dual"
+    update_interval: 50ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 50)) % 7) < 3;
+        it[i] = on ? Color(133, 109, 219) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Oscillate"
+    update_interval: 60ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((58 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Pride 2015"
+    update_interval: 20ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(117, 161, 1) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Juggle"
+    update_interval: 30ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(254, 70, 26);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Palette"
+    update_interval: 40ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(103, 151, 65);
+      }
+
+- addressable_lambda:
+    name: "WLED Fire 2012"
+    update_interval: 50ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Colorwaves"
+    update_interval: 60ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 10 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED BPM"
+    update_interval: 20ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(2, 166, 74);
+      if (b >= 0 && b < n) it[b] = Color(122, 30, 54);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Fill Noise"
+    update_interval: 30ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 30)) % 9) < 2;
+        it[i] = on ? Color(93, 5, 3) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Noise 1"
+    update_interval: 40ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((194 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Noise 2"
+    update_interval: 50ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(29, 169, 9) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Noise 3"
+    update_interval: 60ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(246, 94, 130);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Noise 4"
+    update_interval: 20ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(207, 127, 153);
+      }
+
+- addressable_lambda:
+    name: "WLED Colortwinkles"
+    update_interval: 30ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Lake"
+    update_interval: 40ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 7 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Meteor"
+    update_interval: 50ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(90, 46, 2);
+      if (b >= 0 && b < n) it[b] = Color(114, 70, 126);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Meteor Smooth"
+    update_interval: 60ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 60)) % 5) < 4;
+        it[i] = on ? Color(53, 157, 43) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Railway"
+    update_interval: 20ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((150 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Ripple"
+    update_interval: 30ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(197, 177, 17) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Twinklefox"
+    update_interval: 40ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(238, 118, 234);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Twinklecat"
+    update_interval: 50ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(55, 103, 241);
+      }
+
+- addressable_lambda:
+    name: "WLED Halloween Eyes"
+    update_interval: 60ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Solid Pattern"
+    update_interval: 20ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 15 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Solid Pattern Tri"
+    update_interval: 30ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(178, 182, 186);
+      if (b >= 0 && b < n) it[b] = Color(106, 110, 198);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Spots"
+    update_interval: 40ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 40)) % 7) < 3;
+        it[i] = on ? Color(13, 53, 83) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Spots Fade"
+    update_interval: 50ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((106 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Glitter"
+    update_interval: 60ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(109, 185, 25) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Candle"
+    update_interval: 20ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(230, 142, 82);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Starburst"
+    update_interval: 30ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(159, 79, 73);
+      }
+
+- addressable_lambda:
+    name: "WLED Exploding Fireworks"
+    update_interval: 40ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Bouncing Balls"
+    update_interval: 50ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 12 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Sinelon"
+    update_interval: 60ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(10, 62, 114);
+      if (b >= 0 && b < n) it[b] = Color(98, 150, 14);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Popcorn"
+    update_interval: 20ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 20)) % 9) < 2;
+        it[i] = on ? Color(229, 205, 123) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Drip"
+    update_interval: 30ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((62 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Plasma"
+    update_interval: 40ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(21, 193, 33) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Percent"
+    update_interval: 50ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(222, 166, 186);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Ripple Rainbow"
+    update_interval: 60ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(7, 55, 161);
+      }
+
+- addressable_lambda:
+    name: "WLED Heartbeat"
+    update_interval: 20ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Pacifica"
+    update_interval: 30ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 9 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Candle Multi"
+    update_interval: 40ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(98, 198, 42);
+      if (b >= 0 && b < n) it[b] = Color(90, 190, 86);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Solid Glitter"
+    update_interval: 50ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 50)) % 5) < 4;
+        it[i] = on ? Color(189, 101, 163) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Sunrise"
+    update_interval: 60ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((198 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Phased"
+    update_interval: 20ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(189, 201, 41) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Twinkleup"
+    update_interval: 30ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(214, 190, 34);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Noise Pal"
+    update_interval: 40ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(111, 31, 249);
+      }
+
+- addressable_lambda:
+    name: "WLED Sinewave"
+    update_interval: 50ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Phased Noise"
+    update_interval: 60ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 17 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Flow"
+    update_interval: 20ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(186, 78, 226);
+      if (b >= 0 && b < n) it[b] = Color(82, 230, 158);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Chunchun"
+    update_interval: 30ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 30)) % 7) < 3;
+        it[i] = on ? Color(149, 253, 203) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Dancing Shadows"
+    update_interval: 40ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((154 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Washing Machine"
+    update_interval: 50ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(101, 209, 49) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Blends"
+    update_interval: 60ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(206, 214, 138);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED TV Simulator"
+    update_interval: 20ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(215, 7, 81);
+      }
+
+- addressable_lambda:
+    name: "WLED Dynamic Smooth"
+    update_interval: 30ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Spaceships"
+    update_interval: 40ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 14 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Crazy Bees"
+    update_interval: 50ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(18, 214, 154);
+      if (b >= 0 && b < n) it[b] = Color(74, 14, 230);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Ghost Rider"
+    update_interval: 60ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 60)) % 9) < 2;
+        it[i] = on ? Color(109, 149, 243) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Blobs"
+    update_interval: 20ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((110 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Scrolling Text"
+    update_interval: 30ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(13, 217, 57) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Drift"
+    update_interval: 40ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(198, 238, 242);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Distortion Waves"
+    update_interval: 50ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(63, 239, 169);
+      }
+
+- addressable_lambda:
+    name: "WLED Soap"
+    update_interval: 60ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Octopus"
+    update_interval: 20ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 11 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Waving Cell"
+    update_interval: 30ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(106, 94, 82);
+      if (b >= 0 && b < n) it[b] = Color(66, 54, 46);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Pixels"
+    update_interval: 40ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 40)) % 5) < 4;
+        it[i] = on ? Color(69, 45, 27) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Pixelwave"
+    update_interval: 50ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((66 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Juggles"
+    update_interval: 60ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(181, 225, 65) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Matripix"
+    update_interval: 20ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(190, 6, 90);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Gravimeter"
+    update_interval: 30ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(167, 215, 1);
+      }
+
+- addressable_lambda:
+    name: "WLED Plasmoid"
+    update_interval: 40ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Puddles"
+    update_interval: 50ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 8 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Midnoise"
+    update_interval: 60ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(194, 230, 10);
+      if (b >= 0 && b < n) it[b] = Color(58, 94, 118);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Noisemove"
+    update_interval: 20ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 20)) % 7) < 3;
+        it[i] = on ? Color(29, 197, 67) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Lavalamp"
+    update_interval: 30ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((202 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Waterfall"
+    update_interval: 40ms
+    lambda: |-
+      bool on = ((millis() / 190) % 2) == 0;
+      it.all() = on ? Color(93, 233, 73) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Firenoise"
+    update_interval: 50ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(182, 30, 194);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Wavesins"
+    update_interval: 60ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(15, 191, 89);
+      }
+
+- addressable_lambda:
+    name: "WLED Rocktaves"
+    update_interval: 20ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Akemi"
+    update_interval: 30ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 16 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Distortion"
+    update_interval: 40ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(26, 110, 194);
+      if (b >= 0 && b < n) it[b] = Color(50, 134, 190);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Cotton Candy"
+    update_interval: 50ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 50)) % 9) < 2;
+        it[i] = on ? Color(245, 93, 107) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Aurora"
+    update_interval: 60ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((158 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED Pulsar"
+    update_interval: 20ms
+    lambda: |-
+      bool on = ((millis() / 70) % 2) == 0;
+      it.all() = on ? Color(5, 241, 81) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Ripple Peak"
+    update_interval: 30ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(174, 54, 42);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Morse"
+    update_interval: 40ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(119, 167, 177);
+      }
+
+- addressable_lambda:
+    name: "WLED Vortex"
+    update_interval: 50ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Tartan"
+    update_interval: 60ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 13 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Polar Lights"
+    update_interval: 20ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(114, 246, 122);
+      if (b >= 0 && b < n) it[b] = Color(42, 174, 6);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Swirl"
+    update_interval: 30ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 30)) % 5) < 4;
+        it[i] = on ? Color(205, 245, 147) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED DNA"
+    update_interval: 40ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((114 * x)), uint8_t(255 * (1.0f - x)));
+      }
+
+- addressable_lambda:
+    name: "WLED DNA Spiral"
+    update_interval: 50ms
+    lambda: |-
+      bool on = ((millis() / 130) % 2) == 0;
+      it.all() = on ? Color(173, 249, 89) : Color::BLACK;
+
+- addressable_lambda:
+    name: "WLED Yves"
+    update_interval: 60ms
+    lambda: |-
+      static int p = 0;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      it[p % n] = Color(166, 78, 146);
+      p = (p + 1) % n;
+
+- addressable_lambda:
+    name: "WLED Firenoise 2"
+    update_interval: 20ms
+    lambda: |-
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t r = it[i].get_red();
+        uint8_t g = it[i].get_green();
+        uint8_t b = it[i].get_blue();
+        it[i] = Color((r > 18) ? r - 18 : 0, (g > 18) ? g - 18 : 0, (b > 18) ? b - 18 : 0);
+      }
+      if (it.size() > 0 && (random_uint32() % 3 == 0)) {
+        it[random_uint32() % it.size()] = Color(223, 143, 9);
+      }
+
+- addressable_lambda:
+    name: "WLED Frizzles"
+    update_interval: 30ms
+    lambda: |-
+      static int off = 0;
+      off++;
+      for (int i = 0; i < it.size(); i++) {
+        uint8_t wheel = uint8_t((i * 256 / (it.size() == 0 ? 1 : it.size()) + off * 3) & 255);
+        if (wheel < 85) it[i] = Color(255 - wheel * 3, wheel * 3, 0);
+        else if (wheel < 170) { wheel -= 85; it[i] = Color(0, 255 - wheel * 3, wheel * 3); }
+        else { wheel -= 170; it[i] = Color(wheel * 3, 0, 255 - wheel * 3); }
+      }
+
+- addressable_lambda:
+    name: "WLED Game Of Life"
+    update_interval: 40ms
+    lambda: |-
+      float t = millis() / 500.0f;
+      for (int i = 0; i < it.size(); i++) {
+        float h = fmodf(float((i * 10 + int(t * 20)) % 360), 360.0f);
+        float r, g, b;
+        hsv_to_rgb(h, 1.0f, 1.0f, r, g, b);
+        it[i] = Color(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255));
+      }
+
+- addressable_lambda:
+    name: "WLED Matrix"
+    update_interval: 50ms
+    lambda: |-
+      static int a = 0;
+      static int d = 1;
+      int n = it.size();
+      it.all() = Color::BLACK;
+      if (n == 0) return;
+      int b = n - 1 - a;
+      it[a] = Color(202, 126, 50);
+      if (b >= 0 && b < n) it[b] = Color(34, 214, 78);
+      a += d;
+      if (a <= 0 || a >= (n / 2)) d = -d;
+
+- addressable_lambda:
+    name: "WLED Fireworks 1D"
+    update_interval: 60ms
+    lambda: |-
+      int n = it.size();
+      for (int i = 0; i < n; i++) {
+        bool on = ((i + (millis() / 60)) % 7) < 3;
+        it[i] = on ? Color(165, 141, 187) : Color::BLACK;
+      }
+
+- addressable_lambda:
+    name: "WLED Fireworks Starburst"
+    update_interval: 20ms
+    lambda: |-
+      static float t = 0.0f;
+      t += 0.08f;
+      for (int i = 0; i < it.size(); i++) {
+        float x = sinf(i * 0.22f + t) * 0.5f + 0.5f;
+        it[i] = Color(uint8_t(255 * x), uint8_t((70 * x)), uint8_t(255 * (1.0f - x)));
+      }
