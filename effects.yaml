@@ -1,0 +1,281 @@
+      - addressable_lambda:
+          name: "Rolling Balls (10 Bälle)"
+          update_interval: 30ms
+          lambda: |-
+            static float pos[10] = {0, float ((it.size() / 10) * 1), float ((it.size() / 10) * 2), float ((it.size() / 10) * 3), float ((it.size() / 10) * 4), float ((it.size() / 10) * 5), float ((it.size() / 10) * 6), float ((it.size() / 10) * 7), float ((it.size() / 10) * 8), float ((it.size() / 10) * 9)};
+            float speed = 0.8;
+
+            // Farben der 10 Bälle
+            Color colors[10] = {
+              Color(255, 0, 0),     // Rot
+              Color(255, 128, 0),   // Orange
+              Color(255, 255, 0),   // Gelb
+              Color(0, 255, 0),     // Grün
+              Color(0, 255, 255),   // Cyan
+              Color(0, 0, 255),     // Blau
+              Color(128, 0, 255),   // Violett
+              Color(255, 0, 255),   // Magenta
+              Color(255, 0, 128),   // Pink
+              Color(255, 255, 255)  // Weiß
+            };
+
+            // Abdunkeln aller LEDs (Trail)
+            for (int i = 0; i < it.size(); i++) {
+              uint8_t r = it[i].get_red();
+              uint8_t g = it[i].get_green();
+              uint8_t b = it[i].get_blue();
+
+              r = (r > 10) ? r - 10 : 0;
+              g = (g > 10) ? g - 10 : 0;
+              b = (b > 10) ? b - 10 : 0;
+
+              it[i] = Color(r, g, b);
+            }
+
+            // Bälle bewegen und setzen
+            for (int i = 0; i < 10; i++) {
+              pos[i] += speed;
+              if (pos[i] >= it.size()) pos[i] -= it.size();
+              it[int(pos[i])] = colors[i];
+            }
+      - addressable_lambda:
+          name: "Mint → Blau → Lila Verlauf"
+          update_interval: 16ms
+          lambda: |-
+            int midpoint = it.size() / 2;
+            for (int i = 0; i < it.size(); i++) {
+              float red, green, blue;
+
+              if (i <= midpoint) {
+                // Mintgrün (62%, 100%, 87%) → Blau (0%, 0%, 100%)
+                float ratio = float(i) / float(midpoint);
+                red = (0.62 * (1.0 - ratio));
+                green = (1.0 * (1.0 - ratio));
+                blue = 0.87 + (0.13 * ratio); // geht von 87% zu 100%
+              } else {
+                // Blau (0%, 0%, 100%) → Lila (100%, 0%, 100%)
+                float ratio = float(i - midpoint) / float(it.size() - midpoint - 1);
+                red = ratio;
+                green = 0.0;
+                blue = 1.0;
+              }
+
+              it[i] = Color(red * 255, green * 255, blue * 255);
+            }
+      - addressable_lambda:
+          name: "Blau zu Lila Verlauf"
+          update_interval: 16ms
+          lambda: |-
+            for (int i = 0; i < it.size(); i++) {
+              float ratio = float(i) / float(it.size() - 1);
+              // Farbverlauf von Blau (0,0,1) nach Lila (1,0,1)
+              float red = ratio;
+              float green = 0.0;
+              float blue = 1.0;
+              it[i] = Color(red * 255, green * 255, blue * 255);
+            }
+      - addressable_color_wipe:
+          name: "Start Ring"
+          colors:
+            - red: 100%
+              green: 100%
+              blue: 100%
+              num_leds: 15
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 15
+          add_led_interval: 20ms
+          reverse: false
+      - addressable_lambda:
+          name: "Start Effect"
+          update_interval: 10ms
+          lambda: |-
+            it[0] = Color(255, 170, 66);
+            for (int i = it.size() - 1; i > 0; i--) {
+              it[i] = it[i - 1].get();
+            }
+      - addressable_lambda:
+          name: "Stop Effect"
+          update_interval: 10ms
+          lambda: |-
+            it[0] = Color(0,0,0);
+            for (int i = it.size() - 1; i > 0; i--) {
+              it[i] = it[i - 1].get();
+            }
+      - addressable_lambda:
+          name: "Dual Start Effect"
+          update_interval: 16ms
+          lambda: |-
+           
+            static int step = 0;
+            if (initial_run) {
+            step = 0;
+            it.all() = Color::BLACK;
+            // optionally do a return so nothing happens until the next update_interval
+            return;
+            }
+            int center_left = (it.size() / 2);
+            int center_right = ((it.size() / 2)+1);
+
+            int left = center_left - step;
+            int right = center_right + step;
+
+            if (left >= 0)
+              it[left] = Color(255, 170, 66);
+            if (right < it.size())
+              it[right] = Color(255, 170, 66);
+
+            step++;
+            if (left <= 0 && right >= it.size() - 1) {
+              step = it.size(); // Stoppen
+            }
+      - addressable_lambda:
+          name: "Zuckerstange Laufend"
+          update_interval: 100ms
+          lambda: |-
+            static int offset = 0;
+            // Länge eines Farbblocks (z.B. 3 LEDs rot, 3 LEDs weiß)
+            const int block_size = 15;
+            for (int i = 0; i < it.size(); i++) {
+              int pos = (i + offset) / block_size;
+            if (pos % 2 == 0) {
+              // Rot
+              it[i] = Color(255, 0, 0);
+            } else {
+              // Weiß
+              it[i] = Color(255, 220, 200);
+            }
+            }
+
+            // Bewegung von oben nach unten
+            offset++;
+            if (offset >= block_size * 2) {
+            offset = 0;
+            }
+      - pulse:
+          name: "Pulse"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+          min_brightness: 20%
+          max_brightness: 100%
+      - addressable_color_wipe:
+          name: "Wipe Red"
+          colors:
+            - red: 100%
+              green: 0%
+              blue: 0%
+              num_leds: 15
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 15
+          add_led_interval: 40ms
+          reverse: false
+      - addressable_color_wipe:
+          name: "Wipe Light Blue"
+          colors:
+            - red: 0%
+              green: 100%
+              blue: 100%
+              num_leds: 15
+              gradient: true
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 15
+          add_led_interval: 40ms
+          reverse: false
+      - addressable_rainbow:
+          name: "Rainbow"
+          speed: 25
+          width: 81
+      - addressable_lambda:
+          name: "Regenbogen"
+          update_interval: 16ms
+          lambda: |-
+            static float offset = 0.0f;
+            offset += 1.0f;   // Geschwindigkeit in Grad
+            if (offset >= 360.0f) offset -= 360.0f;
+
+            int num = it.size();
+
+            for (int i = 0; i < num; i++) {
+              float position = (float)i / (float)num;
+              float hue = (position * 360.0f) + offset;
+              if (hue >= 360.0f) hue -= 360.0f;
+
+              float r, g, b;
+              hsv_to_rgb(hue, 1.0f, 1.0f, r, g, b);
+
+              it[i] = Color(
+                uint8_t(r * 255),
+                uint8_t(g * 255),
+                uint8_t(b * 255)
+              );
+            }
+      - strobe:
+          name: "Strobe"
+          colors:
+            - state: true
+              brightness: 100%
+              red: 100%
+              green: 100%
+              blue: 100%
+              duration: 50ms
+            - state: false
+              duration: 50ms
+      - strobe:
+          name: "Strobe Red"
+          colors:
+            - state: true
+              brightness: 100%
+              red: 100%
+              green: 0%
+              blue: 0%
+              duration: 50ms
+            - state: false
+              duration: 50ms
+      - pulse:
+          name: Fast Pulse
+          transition_length: 0.5s
+          update_interval: 0.5s
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: Slow Pulse
+          transition_length: 500ms
+          update_interval: 2s
+      - pulse:
+          name: Asymmetrical Pulse
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+      - pulse:
+          name: "Heart Beat"
+          transition_length:
+            on_length: 1s
+            off_length: 500ms
+          update_interval: 1.5s
+          min_brightness: 35%
+          max_brightness: 100%
+      - random:
+      - flicker:
+      - flicker:
+          name: Flicker Effect With Custom Values
+          alpha: 95%
+          intensity: 1.5%
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_fireworks:
+          name: Fireworks Effect With Custom Values
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
